@@ -1,145 +1,221 @@
-﻿internal class Program
-{   class output
+using System.Numerics;
+using System.Runtime.Serialization;
+
+
+internal class Program
+{
+    class UserInterface
     {
-        public void makegrid(ref char[,] grid, int player)
+        public char[,] grid;
+        public enum Player
         {
-            clearscreen();
-            for(int i = 0; i < 3; i++)
+            Player_1,
+            Player_2,
+                none
+        }
+        public Player curruntTurn;
+        public int rowIndex, colIndex;
+        public string message;
+        public UserInterface()
+        {
+            grid = new char[3, 3];
+            curruntTurn = Player.Player_1;
+            colIndex = 0;
+            rowIndex= 0;
+            message = string.Empty;
+            ClearGrid();
+            displayGrid();
+        }
+        public void playerInputRC()
+        {
+            while (true)
             {
-                for(int j = 0; j < 3; j++)
+                Console.WriteLine("Enter Row: ");
+                rowIndex = int.Parse(Console.ReadLine());
+                Console.WriteLine("Enter Column: ");
+                colIndex = int.Parse(Console.ReadLine());
+                if (rowIndex <= 3 && colIndex <= 3 && rowIndex >= 1 && colIndex >= 1)
                 {
-                    Console.Write(" "+grid[i,j]+" ");
+                    break;
+                }
+                else
+                    Console.WriteLine("Wrong Enteries. Try again");
+            }
+
+        }
+        public void displayGrid()
+        {
+            
+            for (int i = 0; i < 3; i++)
+            {
+                for (int j = 0; j < 3; j++)
+                {   
+                    Console.Write(grid[i, j] + " ");
+
                 }
                 Console.WriteLine("\n");
             }
         }
-        public void clearscreen()
+        public void ClearGrid()
         {
-            Console.Clear();
-        }
-
-    }
-    class gameLogic
-    {
-        int counter = 2;
-        private output Output;
-        char[,] grid;
-        int row, col;
-        public gameLogic()
-        {
-            Output = new output();
-            grid = new char[3, 3];
-            resetgrid();
-        }//constructor who will initilize the data in array
-        public void getdata()
-        {
-            do
+            for(int i = 0; i < 3; i++)
             {
-                Console.WriteLine("Enter Row starting from 1");
-                row = int.Parse(Console.ReadLine());
-                Console.WriteLine("Enter Column starting from 1");
-                col = int.Parse(Console.ReadLine());
-                if (row > 3 || row < 1 || col > 3 || col < 1)
+                for(int j=0; j < 3; j++)
                 {
-                    Console.WriteLine("You have entered a incorrect number. Try again");
+                    grid[i, j] = '_';
                 }
             }
-            while ((row > 3 || row < 1 || col > 3 || col < 1));
-
-        }//getdata is used in input method. This method only takes row and col from user.
-        public void input()
+        }
+        public void updateUIForTurn()
         {
-            int incorrect = 0;
-            if(counter % 2 == 0)
+            Console.Clear();
+            displayGrid();
+            if(message != string.Empty)
             {
-                do {
-                    if (incorrect > 0)
-                    {
-                        Console.WriteLine("You have Entered Wrong Choice");
-                        Console.WriteLine("Please Choose values in between 1,3 that have not been already filled");
-                    }
-                    Console.WriteLine("Player 1 Turn ");
-                    getdata();
-                    counter++; 
-                    incorrect++;
-                }
-                while (grid[row-1,col-1] != '-');
-                grid[(row - 1), (col - 1)] = 'O';
-                Output.makegrid(ref grid, 1);
+                Console.WriteLine(message);
+            }
+            
+            Console.Write("Turn :: " + curruntTurn);
+            if(curruntTurn == Player.Player_1)
+            {
+                Console.Write("(0)");
             }
             else
             {
-                do
-                {
-                    if (incorrect > 0)
-                    {
-                        Console.WriteLine("You have Entered Wrong Choice");
-                        Console.WriteLine("Please Choose values in between 1,3 that have not been already filled");
-                    }
-                    Console.WriteLine("Player 2 Turn ");
-                    getdata();
-                    counter++;
-                    incorrect++;
-                }
-                while (grid[row - 1, col - 1] != '-' );
-                grid[(row - 1), (col - 1)] = 'X';
-                Output.makegrid(ref grid, 2);
+                Console.Write("(1)");
             }
-        }//all the input logic is here
-        public bool checkconditions()
+            Console.WriteLine();
+            playerInputRC();
+            
+        }
+        public void updateUIForEnd(Player pWinner)
         {
-            if((grid[0, 0] == 'X' && grid[1, 0] == 'X' && grid[2, 0] == 'X')|| (grid[0, 1] == 'X' && grid[1, 1] == 'X' && grid[2, 1] == 'X')|| (grid[0, 2] == 'X' && grid[1, 2] == 'X' && grid[2, 2] == 'X')|| (grid[0, 0] == 'X' && grid[0, 1] == 'X' && grid[0, 2] == 'X')|| (grid[1, 0] == 'X' && grid[1, 1] == 'X' && grid[1, 2] == 'X')|| (grid[2, 0] == 'X' && grid[2, 1] == 'X' && grid[2, 2] == 'X') || (grid[0,0] == 'X' && grid[1,1] == 'X' && grid[2, 2] == 'X') || (grid[0, 2] == 'X' && grid[1, 1] == 'X' && grid[2,0] == 'X'))
+            Console.Clear();
+            displayGrid();
+            if (pWinner == Player.Player_1)
             {
-                Console.WriteLine("Player 2 Wins");
-                return false;
+                Console.WriteLine("Winner : Player_1" );
             }
-            else if ((grid[0, 0] == 'O' && grid[1, 0] == 'O' && grid[2, 0] == 'O') || (grid[0, 1] == 'O' && grid[1, 1] == 'O' && grid[2, 1] == 'O') || (grid[0, 2] == 'O' && grid[1, 2] == 'O' && grid[2, 2] == 'O') || (grid[0, 0] == 'O' && grid[0, 1] == 'O' && grid[0, 2] == 'O') || (grid[1, 0] == 'O' && grid[1, 1] == 'O' && grid[1, 2] == 'O') || (grid[2, 0] == 'O' && grid[2, 1] == 'O' && grid[2, 2] == 'O') || (grid[0, 0] == 'O' && grid[1, 1] == 'O' && grid[2, 2] == 'O') || (grid[0, 2] == 'O' && grid[1, 1] == 'O' && grid[2, 0] == 'O'))
+            else if(pWinner == Player.Player_2) 
             {
-                Console.WriteLine("Player 1 Wins");
-                return false;
+                Console.WriteLine("Winner : Player_2");
             }
-            else { return true; }
-        }//wining conditions
-        public void gameloop()
+            Console.Read();
+        }
+        public void DrawMatch()
         {
-            bool check = true;
-            while (check)
-            {
-
-                input();
-                check = checkconditions();
-            }
-        }//game inner loop works until a player wins
-        public void resetgrid()
-        {
-            for (int i = 0; i < 3; i++)
-            {
-                for (int j = 0; j < 3; j++)
-                {
-                    grid[i, j] = '-';
-                }
-            }
-            Output.makegrid(ref grid, 0);
-        }//reset all the values of grid
+            Console.Clear();
+            displayGrid();
+            Console.WriteLine("Draw!");
+            Console.Read();
+        }
     }
-    private static void Main(string[] args)
+  class TicTacToe
     {
-        gameLogic obj;
-        obj = new gameLogic();
-        char repeat = '1';
-        while(repeat == '1')
+        public UserInterface intrface;
+        public TicTacToe()
         {
-            obj.gameloop();
-            Console.WriteLine("Do you wanna play more? press 1 for yes or any other value for no");
-            repeat = char.Parse(Console.ReadLine());
-            if (repeat == '1')
-            {
-                obj.resetgrid();
-            }
-        }//outer loop of game for playing more or not
-        
- 
+            intrface = new UserInterface();
+        }
+        public bool isCellEmpty(int row, int col)
+        {
+            if (intrface.grid[row - 1,col - 1] == '_') 
+                return true;
+            else
+                return false;
+        }
+        public UserInterface.Player CheckWinner()
+        {
+            
+            if ((intrface.grid[0, 0] == '0' && intrface.grid[1, 0] == '0' && intrface.grid[2, 0] == '0') || (intrface.grid[0, 1] == '0' && intrface.grid[1, 1] == '0' && intrface.grid[2, 1] == '0') || (intrface.grid[0, 2] == '0' && intrface.grid[1, 2] == '0' && intrface.grid[2, 2] == '0') || (intrface.grid[0, 0] == '0' && intrface.grid[0, 1] == '0' && intrface.grid[0, 2] == '0') || (intrface.grid[1, 0] == '0' && intrface.grid[1, 1] == '0' && intrface.grid[1, 2] == '0') || (intrface.grid[2, 0] == '0' && intrface.grid[2, 1] == '0' && intrface.grid[2, 2] == '0') || (intrface.grid[0, 0] == '0' && intrface.grid[1, 1] == '0' && intrface.grid[2, 2] == '0') || (intrface.grid[0, 2] == '0' && intrface.grid[1, 1] == '0' && intrface.grid[2, 0] == '0'))
+                return UserInterface.Player.Player_1;
+            else if ((intrface.grid[0, 0] == '1' && intrface.grid[1, 0] == '1' && intrface.grid[2, 0] == '1') || (intrface.grid[0, 1] == '1' && intrface.grid[1, 1] == '1' && intrface.grid[2, 1] == '1') || (intrface.grid[0, 2] == '1' && intrface.grid[1, 2] == '1' && intrface.grid[2, 2] == '1') || (intrface.grid[0, 0] == '1' && intrface.grid[0, 1] == '1' && intrface.grid[0, 2] == '1') || (intrface.grid[1, 0] == '1' && intrface.grid[1, 1] == '1' && intrface.grid[1, 2] == '1') || (intrface.grid[2, 0] == '1' && intrface.grid[2, 1] == '1' && intrface.grid[2, 2] == '1') || (intrface.grid[0, 0] == '1' && intrface.grid[1, 1] == '1' && intrface.grid[2, 2] == '1') || (intrface.grid[0, 2] == '1' && intrface.grid[1, 1] == '1' && intrface.grid[2, 0] == '1'))
+                return UserInterface.Player.Player_2;
+            else
+                return UserInterface.Player.none;
 
+        }
+        void updateTurn()
+        {
+            if (intrface.curruntTurn == UserInterface.Player.Player_1)
+                intrface.curruntTurn = UserInterface.Player.Player_2;
+            else
+                intrface.curruntTurn = UserInterface.Player.Player_1;
+        }
+        public void setGridValue(int x,int y,UserInterface.Player pCurrentTurn)
+        {
+            if (pCurrentTurn == UserInterface.Player.Player_1)
+                intrface.grid[x-1, y-1] = '0';
+            else
+                intrface.grid[x - 1, y - 1] = '1';
+        }
+        public bool isGridFull()
+        {
+            uint counter = 0;
+            for(int i = 0; i < 3; i++)
+            {
+                for(int j = 0; j < 3; j++)
+                {
+                    if (intrface.grid[i, j] == '0' || intrface.grid[i, j] == '1')
+                        counter = counter + 1 ;
+                }
+            }
+            if(counter == 9)
+                return true;
+            else return false;
+
+        }
+        public void startGameLoop()
+        {
+            while (true)
+            {
+                if (isGridFull())
+                {
+                    intrface.DrawMatch();
+                    break;
+                }
+                else 
+                {
+                    intrface.updateUIForTurn();
+                    if (isCellEmpty(intrface.rowIndex, intrface.colIndex))
+                        setGridValue(intrface.rowIndex, intrface.colIndex, intrface.curruntTurn);
+                    else
+                    {
+                        intrface.message = "This Cell is already Filled";
+                        continue;
+                    }
+                    
+                    if (CheckWinner() != UserInterface.Player.none)
+                    {
+                        intrface.updateUIForEnd(CheckWinner());
+                        break;
+                    }
+                    updateTurn();
+                } 
+            }
+
+
+
+        }
 
     }
+
+    class MainLoop
+    {
+        static TicTacToe game;
+        private static void Main(string[] args)
+        {
+            int repeat;
+             game = new TicTacToe();
+            while (true) {
+                game.startGameLoop();
+                game.intrface.ClearGrid();
+
+            }   
+             
+             Console.ReadKey();
+
+        }
+    }
+   
 }
