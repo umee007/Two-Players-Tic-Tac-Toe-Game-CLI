@@ -100,7 +100,7 @@ internal class Program
             {
                 Console.WriteLine("Winner : Player_2");
             }
-            Console.Read();
+            //Console.Read();
         }
         public void DrawMatch()
         {
@@ -205,10 +205,12 @@ internal class Program
         static TicTacToe game;
         private static void Main(string[] args)
         {
-            int repeat;
+            int repeat = 1;
              game = new TicTacToe();
-            while (true) {
+            while (repeat != 0) {
                 game.startGameLoop();
+                Console.WriteLine("Enter 0 to exit or any other number to continue\n");
+                repeat = int.Parse(Console.ReadLine());
                 game.intrface.ClearGrid();
 
             }   
